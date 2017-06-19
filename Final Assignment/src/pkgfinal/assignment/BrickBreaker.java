@@ -141,6 +141,7 @@ public class BrickBreaker extends JComponent {
             g.setFont(myFont);
             g.setColor(Color.cyan);
             g.drawString("YOU WIN" + finalScore, WIDTH / 2 - 150, HEIGHT / 2);
+            g.drawString("SCORE: " + finalScore, WIDTH / 2 - 150, HEIGHT / 2 + 100);
         }
 
 //            // GAME DRAWING ENDS HERE
