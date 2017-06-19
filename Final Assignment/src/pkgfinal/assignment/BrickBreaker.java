@@ -25,7 +25,7 @@ public class BrickBreaker extends JComponent {
     static final int WIDTH = 800;
     static final int HEIGHT = 600;
     //Title of the window
-    String title = "My Game";
+    String title = "Brick Breaker";
     // sets the framerate and delay for our game
     // you just need to select an approproate framerate
     long desiredFPS = 60;
@@ -103,14 +103,13 @@ public class BrickBreaker extends JComponent {
     public void paintComponent(Graphics g) {
         // always clear the screen first!
         g.clearRect(0, 0, WIDTH, HEIGHT);
-       
-        
+
         // GAME DRAWING GOES HERE
         // draw paddle
-        g.drawRect(player.x, player.y, player.width, player.height);
+        g.fillRect(player.x, player.y, player.width, player.height);
 
         // draw ball
-        g.drawOval(ball.x, ball.y, ball.width, ball.height);
+        g.fillOval(ball.x, ball.y, ball.width, ball.height);
 
         // set color blue
         g.setColor(Color.BLUE);
@@ -118,20 +117,16 @@ public class BrickBreaker extends JComponent {
         // create bricks
         for (Rectangle brick : bricks) {
             g.drawRect(brick.x, brick.y, brick.width, brick.height);
+
         }
 
         // display score and lives
         g.setFont(myFont);
         g.setColor(Color.cyan);
         g.drawString("" + score, WIDTH - 100, 100);
-        g.drawString("Lives: " + lives, 100, 100);
+        g.drawString("Lives: " + lives, 75, 100);
 
-        if (gameStarted == false) {
-            g.setFont(myFont);
-            g.setColor(Color.cyan);
-            g.drawString("Press Spacebar to Play", 400, 400);
-        }
-
+        // if player loses, tell them and display score
         if (done == true && lives == 0) {
             g.clearRect(0, 0, WIDTH, HEIGHT);
             g.setFont(myFont);
@@ -140,6 +135,7 @@ public class BrickBreaker extends JComponent {
             g.drawString("SCORE: " + finalScore, WIDTH / 2 - 150, HEIGHT / 2 + 100);
         }
 
+        // if player wins, tell them and display score
         if (done == true && lives > 0) {
             g.clearRect(0, 0, WIDTH, HEIGHT);
             g.setFont(myFont);
@@ -148,7 +144,6 @@ public class BrickBreaker extends JComponent {
         }
 
 //            // GAME DRAWING ENDS HERE
-//        }
     }
 
     // This method is used to do any pre-setup you might need to do
@@ -177,13 +172,11 @@ public class BrickBreaker extends JComponent {
 
         // the main game loop section
         // game will end if you set done = false;
-//        while (gameStarted == true) {
-//if (gameStarted) {
-
-while (!done) {
+        while (!done) {
             // determines when we started so we can keep a framerate
             startTime = System.currentTimeMillis();
 
+            // end game if out of lives or all bricks are destroyed
             if (lives == 0) {
                 done = true;
                 finalScore();
@@ -202,7 +195,7 @@ while (!done) {
                 resetBall();
             }
 
-            // set player movement
+            // set player speed
             if (leftPressed) {
                 player.x = player.x - 12;
             }
@@ -235,7 +228,7 @@ while (!done) {
 
         }
     }
-    
+
     private Rectangle Rectangle(int x) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
@@ -270,7 +263,7 @@ while (!done) {
 
         @Override
         public void keyPressed(KeyEvent e) {
-
+            // register keyboard for movement
             if (e.getKeyCode() == KeyEvent.VK_LEFT) {
                 leftPressed = true;
             }
@@ -285,7 +278,7 @@ while (!done) {
         // if a key has been released
         @Override
         public void keyReleased(KeyEvent e) {
-
+            // register keyboard for movement
             if (e.getKeyCode() == KeyEvent.VK_LEFT) {
                 leftPressed = false;
             }
@@ -293,8 +286,7 @@ while (!done) {
                 rightPressed = false;
 
             }
-//        if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-//                gameStarted = false;
+            ;
         }
     }
 
@@ -310,7 +302,7 @@ while (!done) {
     }
 
     public void collisions() {
-
+        // if ball hits anything, reverse direction
         if (ball.intersects(player)) {
             velocityY = -velocityY;
         }
@@ -323,7 +315,8 @@ while (!done) {
         if (ball.y < 0) {
             velocityY = -velocityY;
         }
-
+       
+        // don't let player leave area
         if (player.x + player.width > WIDTH) {
             player.x = player.x - 10;
         }
@@ -331,11 +324,13 @@ while (!done) {
         if (player.x < 0) {
             player.x = player.x + 10;
         }
-
+        
+        // if player misses ball, subtract 1 life
         if (ball.y > HEIGHT) {
             lives = lives - 1;
         }
-
+        
+        // remove brick, reverse ball and add to score if ball hits a brick
         for (int i = 0; i < bricks.size(); i++) {
             if (ball.intersects(bricks.get(i))) {
                 removeBlock(i);
@@ -347,11 +342,13 @@ while (!done) {
     }
 
     public void removeBlock(int brick) {
+        // remove brick that ball hits
         bricks.remove(brick);
 
     }
 
     public void resetBall() {
+        // reset ball and player after player misses the ball
         ball.x = WIDTH / 2;
         ball.y = HEIGHT / 2;
         velocityX = 8;
@@ -361,6 +358,7 @@ while (!done) {
     }
 
     public void finalScore() {
+        // caluclate final score
         if (lives == 0) {
             finalScore = score;
         } else {
