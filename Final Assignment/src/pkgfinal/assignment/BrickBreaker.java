@@ -31,21 +31,42 @@ public class BrickBreaker extends JComponent {
     long desiredFPS = 60;
     long desiredTime = (1000) / desiredFPS;
     // YOUR GAME VARIABLES WOULD GO HERE
-    Rectangle player = new Rectangle(WIDTH / 2 - 50, HEIGHT - 50, 100, 25);
+
+    // create player
+    Rectangle player = new Rectangle(WIDTH / 2 + 150, HEIGHT - 50, 100, 25);
+
+    // set width and height of player and bricks
     int playerWidth = 100;
     int playerHeight = 25;
     int brickWidth = 50;
     int brickHeight = 20;
+
+    // create ball
     Rectangle ball = new Rectangle(WIDTH / 2, HEIGHT / 2, 25, 25);
+
+    // create booleans for left and right arrow keys
     boolean leftPressed;
     boolean rightPressed;
-    int velocityX = 6;
-    int velocityY = 6;
+
+    // set speed of ball
+    int velocityX = 8;
+    int velocityY = 8;
+
+    // create array for bricks
     ArrayList<Rectangle> bricks = new ArrayList();
+
+    // set score and lives
     int score = 0;
     int lives = 3;
+
+    // create font
     Font myFont = new Font("Arial", Font.BOLD, 50);
+
+    // create booleans for game status
     boolean gameOver = false;
+    boolean gameStarted = false;
+    boolean done = false;
+    int finalScore;
 
     // GAME VARIABLES END HERE   
     // Constructor to create the Frame and place the panel in
@@ -82,7 +103,8 @@ public class BrickBreaker extends JComponent {
     public void paintComponent(Graphics g) {
         // always clear the screen first!
         g.clearRect(0, 0, WIDTH, HEIGHT);
-
+       
+        
         // GAME DRAWING GOES HERE
         // draw paddle
         g.drawRect(player.x, player.y, player.width, player.height);
@@ -103,7 +125,28 @@ public class BrickBreaker extends JComponent {
         g.setColor(Color.cyan);
         g.drawString("" + score, WIDTH - 100, 100);
         g.drawString("Lives: " + lives, 100, 100);
-//       
+
+        if (gameStarted == false) {
+            g.setFont(myFont);
+            g.setColor(Color.cyan);
+            g.drawString("Press Spacebar to Play", 400, 400);
+        }
+
+        if (done == true && lives == 0) {
+            g.clearRect(0, 0, WIDTH, HEIGHT);
+            g.setFont(myFont);
+            g.setColor(Color.cyan);
+            g.drawString("GAME OVER", WIDTH / 2 - 150, HEIGHT / 2 - 100);
+            g.drawString("SCORE: " + finalScore, WIDTH / 2 - 150, HEIGHT / 2 + 100);
+        }
+
+        if (done == true && lives > 0) {
+            g.clearRect(0, 0, WIDTH, HEIGHT);
+            g.setFont(myFont);
+            g.setColor(Color.cyan);
+            g.drawString("YOU WIN" + finalScore, WIDTH / 2 - 150, HEIGHT / 2);
+        }
+
 //            // GAME DRAWING ENDS HERE
 //        }
     }
@@ -113,17 +156,13 @@ public class BrickBreaker extends JComponent {
     public void preSetup() {
         // Any of your pre setup before the loop starts should go here
 
+        // crete rectangles for all bricks
         for (int x = 0; x < 16; x++) {
             for (int y = 0; y < 10; y++) {
 
                 bricks.add(new Rectangle(brickWidth * x, brickHeight * y, brickWidth, brickHeight));
             }
         }
-
-
-
-
-
     }
 
     // The main game loop
@@ -138,49 +177,43 @@ public class BrickBreaker extends JComponent {
 
         // the main game loop section
         // game will end if you set done = false;
-        boolean done = false;
-        while (!done) {
+//        while (gameStarted == true) {
+//if (gameStarted) {
+
+while (!done) {
             // determines when we started so we can keep a framerate
             startTime = System.currentTimeMillis();
 
-            // all your game rules and move is done in here
-            // GAME LOGIC STARTS HERE 
-            
-            // while gameover = false run game
-           // while (!gameOver) {
+            if (lives == 0) {
+                done = true;
+                finalScore();
+            }
 
-                if (lives == 0) {
-                    gameOver = true;
-                }
-                
-                if (score == 160) {
-                    gameOver = true;
-                }
-        
-    
-                collisions();
+            if (score == 160) {
+                done = true;
+                finalScore();
+            }
 
-                if (ball.y > HEIGHT) {
-                    resetBall();
-                }
+            // call method collisions
+            collisions();
 
-                if (leftPressed) {
-                    player.x = player.x - 10;
-                }
-                if (rightPressed) {
-                    player.x = player.x + 10;
-                }
+            // reset ball if player misses
+            if (ball.y > HEIGHT) {
+                resetBall();
+            }
 
-                // updates x coordinate every second
-                ball.x += velocityX;
-                // updates y coordinate every second
-                ball.y += velocityY;
+            // set player movement
+            if (leftPressed) {
+                player.x = player.x - 12;
+            }
+            if (rightPressed) {
+                player.x = player.x + 12;
+            }
 
-        
-    
-        
-    
-
+            // updates x coordinate every second
+            ball.x += velocityX;
+            // updates y coordinate every second
+            ball.y += velocityY;
 
             // GAME LOGIC ENDS HERE 
             // update the drawing (calls paintComponent)
@@ -201,9 +234,8 @@ public class BrickBreaker extends JComponent {
             };
 
         }
-        
     }
-
+    
     private Rectangle Rectangle(int x) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
@@ -245,7 +277,9 @@ public class BrickBreaker extends JComponent {
             if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
                 rightPressed = true;
             }
-
+            if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+                gameStarted = true;
+            }
         }
 
         // if a key has been released
@@ -258,14 +292,13 @@ public class BrickBreaker extends JComponent {
             if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
                 rightPressed = false;
 
-
-
             }
-
+//        if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+//                gameStarted = false;
         }
     }
 
-     /**
+    /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
@@ -321,9 +354,19 @@ public class BrickBreaker extends JComponent {
     public void resetBall() {
         ball.x = WIDTH / 2;
         ball.y = HEIGHT / 2;
-        velocityX = 6;
-        velocityY = 6;
+        velocityX = 8;
+        velocityY = 8;
+        player.x = WIDTH / 2 + 150;
 
+    }
+
+    public void finalScore() {
+        if (lives == 0) {
+            finalScore = score;
+        } else {
+            finalScore = score * (lives * 2);
+
+        }
 
     }
 }
